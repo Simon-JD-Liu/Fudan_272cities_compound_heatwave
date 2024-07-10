@@ -2,7 +2,7 @@
 ####Load required packages#########
 #################################
 library(data.table);library(lubridate);library(dplyr);library(dlnm);library(splines)
-library(tsModel);library(forestplot);library(reshape2);library(mvmeta)
+library(tsModel);library(forestplot);library(reshape2);library(mvmeta);library(mixmeta)
 library(metafor);library(ggthemes);library("ggsci");library(tidyr)
 #################################
 
@@ -113,7 +113,7 @@ character_define<-function(x,HW,thr,metrix){
   nHW.per.season<-0  
   for(g in seq(nseason)){
     season_data<-subset(tempData,Tos==g);
-    eval(parse(text=paste("vec.code<-rle(season_data$",HW,")",sep="")));  ## 主要函数rle,由向量第一个元素起始,识别连续元素的个数;HW是热浪频率
+    eval(parse(text=paste("vec.code<-rle(season_data$",HW,")",sep=""))); 
     val<-vec.code$values;pos<-vec.code$lengths
     if(length(val)>1){
       freq.hw<-sum(val)
@@ -170,14 +170,14 @@ range(as.matrix(per_com)[which(as.matrix(per_com)!=0)])
 HW_types <- c("Day heatwave", "Night heatwave", "Compound heatwave")
 chaname <- c("Intensity", "Duration", "Timing")
 
-for (l in 1:3) {     # 遍历3种热浪类型
-  for (t in 1) {     # t 暂时设为1，处理对应的亚组
+for (l in 1:3) {    
+ t<-1  
     yall <- matrix(NA, gg[t], 3, dimnames = list(1:gg[t], paste("b", seq(3), sep = "")))
     Sall <- vector("list", gg[t])
     
     for (i in 1:length(dlist1)) {   
       sub <- dlist1[[i]]
-      causes <- as.data.frame(sub[, c(25, 26, 28, 32:35, 37)])
+      causes <- as.data.frame(sub[, c(25)])
       
    
       DIn <- crossbasis(sub$DI, lag = c(0, 10), argvar = list("lin"), arglag = arglag)
@@ -194,23 +194,24 @@ for (l in 1:3) {     # 遍历3种热浪类型
                     family = quasipoisson, data = sub)
       
       if (l == 1) {
-        crall <- crossreduce(DIn, mfirst, type = "var", value = 1)
+        crall <- crossreduce(DIn, mfirst)
       } else if (l == 2) {
-        crall <- crossreduce(NIn, mfirst, type = "var", value = 1)
+        crall <- crossreduce(NIn, mfirst)
       } else if (l == 3) {
-        crall <- crossreduce(CIn, mfirst, type = "var", value = 1)
+        crall <- crossreduce(CIn, mfirst)
       }
       
       yall[i, ] <- coef(crall)
       Sall[[i]] <- vcov(crall)
     }
 
-    mvall <- mvmeta(yall, Sall, method = "reml")
+    mvall <- mvmeta(yall~as.numeric(gdp)+as.numeric(urban)+as.numeric(rainfall)+
+                             as.numeric(meantemp)+as.numeric(tempsd), Sall,data=metada, method = "reml")
     
     xlag <- 0:100 / 10
     blag <- do.call("onebasis", c(list(x = xlag),arglag))
     cplag <- crosspred(blag, coef = coef(mvall), vcov = vcov(mvall), model.link = "log", at = 0:100 / 10)
-    plot(cplag, xlim = c(0, 10), main = chaname[1], ylab = "Relative Risk", xlab = "Lag(days)", cex.main = 1.5, cex.lab = 1.5, cex.axis = 1.5)
+    plot(cplag, xlim = c(0, 10), main = chaname[l], ylab = "Relative Risk", xlab = "Lag(days)", cex.main = 1.5, cex.lab = 1.5, cex.axis = 1.5)
     lines(cplag, col = 2, lwd = 2)
   }
 }
