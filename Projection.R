@@ -164,7 +164,7 @@ heatwave_non <- data.frame(matrix(ncol=27, nrow=0))
 colnames(heatwave_non) <- c("time","year","month",paste0(rep(c("D","N","C"),8), rep(1:8, each=3)))
 heatwave_non$time<-as.Date(heatwave_non$time)
 
-#j:gcm； g:时期数; t：城市数；k：SSP
+
 days<-2 ;periodx<-c(2010:2019,2030:2039,2050:2059,2090:2099)
 for (k in c(2,5)) {
   for (t in 1:272) {
@@ -304,8 +304,6 @@ durno_fur2_a<-durno_fur2_b<-array(NA,dim=c(3,10,8,272),dimnames = list(paste0("H
 durno_fur3_a<-durno_fur3_b<-array(NA,dim=c(3,10,8,272),dimnames = list(paste0("HW",1:3),paste0("209",0:9),paste0("T",1:8),paste0("city",1:272)))
 
 
-#每个GCM下的热浪每年时长
-#i是gcm；j是热浪类型
 for (k in 1:272) {
   for (i in 1:8) {
     for (j in 1:3) {
@@ -327,8 +325,7 @@ for (k in 1:272) {
 
 
 ####for ssp1
-#识别热浪:非适应性热浪
-#识别阈值
+
 for (k in c(1)) { 
   for (t in 1:272) {
     eval(parse(text = paste0("threshold_non",k,"_",t,"<-subset(total",k,"_",t,",year%in% c(1986:2015))")))
@@ -370,7 +367,7 @@ heatwave_non <- data.frame(matrix(ncol=15, nrow=0))
 colnames(heatwave_non) <- c("time","year","month",paste0(rep(c("D","N","C"),4), rep(1:4, each=3)))
 heatwave_non$time<-as.Date(heatwave_non$time)
 
-#j:gcm； g:时期数; t：城市数；k：SSP
+
 days<-2 ;periodx<-c(2010:2019,2030:2039,2050:2059,2090:2099)
 for (k in c(1)) {
   for (t in 1:272) {
@@ -381,7 +378,7 @@ for (k in c(1)) {
       
       for (j in 1:4) {
         eval(parse(text = paste0("thr<-cbind(threshold_non_min",k,"_",t,"[,c(1,2,",j,"+2)],threshold_non_max",k,"_",t,"[,c(",j,"+2)])")))
-        #try<-total2_1[,c(j+1,j+9,18:20,1)]#阈值数据
+        #try<-total2_1[,c(j+1,j+9,18:20,1)]
         colnames(thr)[c(3:4)]<-c("min","max")
         eval(parse(text = paste0("try<-total",k,"_",t,"[,c(1,10,11,",j,"+1,",j,"+5)]")))
         colnames(try)[c(4:5)]<-c("rowmin","rowmax")
@@ -390,7 +387,7 @@ for (k in c(1)) {
         
         try<-left_join(try,thr,by=c("month","days"="day"))
         
-        #昼夜热
+        
         v1<-v2<-rep(0,length(try$max))
         for (i in 1:length(try$max)) {
           if(try$rowmax[i]>=try$max[i]) v1[i]<-1
@@ -466,7 +463,7 @@ for (k in c(1)) {
   print(k)
 }
 
-######按年求duration
+######
 
 for (k in c(1)) {
   for (t in 1:272) {
@@ -478,7 +475,7 @@ for (k in c(1)) {
   }
 }
 
-#热浪类型；年份；gcm；城市数
+
 hwno_fur0_c<-array(NA,dim=c(3,length(heatwave_non1_1_fur0$time),4,272),
                    dimnames=list(paste0("HW",1:3),heatwave_non1_1_fur0$year,paste0("T",1:4),paste0("city",1:272)))
 hwno_fur1_c<-array(NA,dim=c(3,length(heatwave_non1_1_fur1$time),4,272),
@@ -508,8 +505,7 @@ durno_fur2_c<-array(NA,dim=c(3,10,4,272),dimnames = list(paste0("HW",1:3),paste0
 durno_fur3_c<-array(NA,dim=c(3,10,4,272),dimnames = list(paste0("HW",1:3),paste0("209",0:9),paste0("T",1:4),paste0("city",1:272)))
 
 
-#每个GCM下的热浪每年时长
-#i是gcm；j是热浪类型
+
 for (k in 1:272) {
   for (i in 1:4) {
     for (j in 1:3) {
