@@ -54,7 +54,7 @@ for (k in 1:3) {#three heatwave types
      }
 
     #meta-analysis
-    eval(parse(text = paste0("mvall<- mixmeta(yall",k,"~as.numeric(gdp)+as.numeric(urban)+as.numeric(rainfall)+
+    eval(parse(text = paste0("mvall<- mvmeta(yall",k,"~as.numeric(gdp)+as.numeric(urban)+as.numeric(rainfall)+
                              as.numeric(meantemp)+as.numeric(tempsd),
                              Sall",k,"data=metada,method='reml')")))
     if(k==3&i==1){model_analysis<-mvall}
