@@ -57,7 +57,7 @@ for (k in 1:3) {#three heatwave types
     eval(parse(text = paste0("mvall<- mvmeta(yall",k,"~as.numeric(gdp)+as.numeric(urban)+as.numeric(rainfall)+
                              as.numeric(meantemp)+as.numeric(tempsd),
                              Sall",k,"data=metada,method='reml')")))
-    if(k==3&i==1){model_analysis<-mvall}
+    if(k==3&t==1){model_analysis<-mvall}
     COEFF[k,t]<-predict(mvall,vcov = T)[1,1]
     SD[k,t]<-predict(mvall,vcov = T)[1,2]
     I2[k,t]<-mvall$I2
@@ -85,11 +85,11 @@ fwald <- function(model,var) {
   return(1-pchisq(waldstat,df))
 }
 
-fwald(model,"gdp")
-fwald(model,"urban")
-fwald(model,"rainfall")
-fwald(model,"meantemp")
-fwald(model,"tempsd")
+fwald(model_analysis,"gdp")
+fwald(model_analysis,"urban")
+fwald(model_analysis,"rainfall")
+fwald(model_analysis,"meantemp")
+fwald(model_analysis,"tempsd")
 
 
 ###################################
